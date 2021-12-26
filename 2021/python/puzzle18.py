@@ -2,6 +2,7 @@ from functools import reduce
 from itertools import chain
 from typing import Optional
 from math import floor, ceil
+from copy import deepcopy
 
 class Tree:
     def __init__(self, left=None, right=None, value=None) -> None:
@@ -46,7 +47,7 @@ class Tree:
         else:
             return False
 
-    def to_the_left(self) -> Optional[Tree]:
+    def to_the_left(self) -> Optional['Tree']:
         p = self
         while p := p.parent:
             if p.parent and not p.is_left:
@@ -66,14 +67,14 @@ class Tree:
                 return n
         return None
 
-    def deepcopy(self):
-        def foo(t: Tree):
-            if t.value is not None:
-                return Tree(value=self.value)
-            assert t.left is not None
-            assert t.right is not None
-            return Tree(foo(t.left), foo(t.right))
-        return foo(self)
+    # def deepcopy(self):
+    #     def foo(t: Tree):
+    #         if t.value is not None:
+    #             return Tree(value=self.value)
+    #         assert t.left is not None
+    #         assert t.right is not None
+    #         return Tree(foo(t.left), foo(t.right))
+    #     return foo(self)
 
 def parse(s: str) -> Tree:
     if s.startswith("["):
@@ -98,7 +99,8 @@ def parse(s: str) -> Tree:
 def add(eq1, eq2):
     return reduce_eq(Tree(eq1, eq2))
 
-def explode(eq: Tree):
+def explode(eq: Tree) -> Optional[Tree]:
+    eq = deepcopy(eq)
     for n in eq:
         if n.depth > 4 and n.value is not None:
             left_node = n.to_the_left()
@@ -114,11 +116,12 @@ def explode(eq: Tree):
                 n.parent.parent.left = new
             else:
                 n.parent.parent.right = new
-            return True
-    return False
+            return eq
+    return None
 
 
-def split(eq):
+def split(eq: Tree) -> Optional[Tree]:
+    eq = deepcopy(eq)
     for n in eq:
         if n.value > 9:
             n.left = Tree(value=floor(n.value/2))
@@ -126,15 +129,15 @@ def split(eq):
             n.left.parent = n
             n.right.parent = n
             n.value = None
-            return True
-    return False
+            return eq
+    return None
 
 
 def reduce_eq(eq):
-    if explode(eq):
-        return reduce_eq(eq)
-    elif split(eq):
-        return reduce_eq(eq)
+    if neq := explode(eq):
+        return reduce_eq(neq)
+    elif neq := split(eq):
+        return reduce_eq(neq)
     else:
         return eq
 
@@ -146,18 +149,14 @@ def magnitude(eq):
 # ex = add(parse("[[[[4,3],4],4],[7,[[8,4],9]]]"), parse("[1,1]"))
 ex = "[1,1]\n[2,2]\n[3,3]\n[4,4]\n[5,5]"
 ex = "[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]\n[[[5,[2,8]],4],[5,[[9,9],0]]]\n[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]\n[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]\n[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]\n[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]\n[[[[5,4],[7,7]],8],[[8,3],8]]\n[[9,3],[[9,9],[6,[4,9]]]]\n[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]\n[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]"
-#for line in open("../inputs/day18.txt").read().splitlines():
-data = list(map(parse, ex.splitlines()))
+real = open("../inputs/day18.txt").read()
+data = list(map(parse, real.splitlines()))
 print(magnitude(reduce(add, data[1:], data[0])))
 
-data1 = list(map(parse, ex.splitlines()))
-data2 = list(map(parse, ex.splitlines()))
 res = []
-for eq1 in data1:
-    eq1wc = eq1.deepcopy()
-    for eq2 in data2:
+for eq1 in data:
+    for eq2 in data:
         if eq1 is eq2:
             continue
-        eq2wc = eq2.deepcopy()
-        res.append(magnitude(add(eq1wc, eq2wc)))
+        res.append(magnitude(add(eq1, eq2)))
 print(max(res))

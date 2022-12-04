@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("../input1.txt");
+    let input = include_str!("../../../inputs/2021_day01.txt");
 
     let mut calories = input
         .split("\n\n")

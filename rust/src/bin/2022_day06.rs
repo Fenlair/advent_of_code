@@ -20,3 +20,13 @@ fn main() {
         }
     }
 }
+
+// Solution from Reddit
+// use itertools::Itertools;
+// fn reddit(input: &Vec<char>) {
+//     let window_size = 14;
+//     input
+//         .windows(window_size)
+//         .position(|window| window.iter().all_unique())
+//         .map(|ind| println!("{}", ind + window_size));
+// }

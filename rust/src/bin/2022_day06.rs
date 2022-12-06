@@ -1,14 +1,19 @@
-use itertools::izip;
+use std::collections::HashSet;
+
+fn is_marker_unique(marker: &[char]) -> bool {
+    let set: HashSet<&char> = HashSet::from_iter(marker.iter());
+    if set.len() == marker.len() {return true}
+    return false
+}
 
 fn main() {
-    let mut input = include_str!("../../../inputs/2022_day06.txt").to_string();
-    input.pop();
+    let input: Vec<char> = include_str!("../../../inputs/2022_day06.txt").chars().collect();
+    let window_size = 14;
 
-    let a = input.chars();
-    let b = a.clone().skip(1);
-    let c = b.clone().skip(1);
-    let d = c.clone().skip(1);
-    for marker in izip!(a, b, c, d) {
-        println!("{:?}", marker)
+    for (i, marker) in input.windows(window_size).enumerate() {
+        if is_marker_unique(marker) {
+            println!("{}", i + window_size);
+            break;
+        }
     }
 }

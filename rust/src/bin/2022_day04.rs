@@ -1,26 +1,37 @@
+fn is_overlap_part1(elf1: &Vec<u32>, elf2: &Vec<u32>) -> u32 {
+    if elf1[0] >= elf2[0] && elf1[1] <= elf2[1] {
+        return 1
+    } else
+    if elf2[0] >= elf1[0] && elf2[1] <= elf1[1] {
+        return 1
+    }
+    return 0
+}
+fn is_overlap_part2(elf1: &Vec<u32>, elf2: &Vec<u32>) -> u32 {
+    if elf1[0] <= elf2[0] && elf1[1] >= elf2[0] {
+        return 1
+    } else
+    if elf2[0] <= elf1[0] && elf2[1] >= elf1[0] {
+        return 1
+    }
+    return 0
+}
+
 fn main() {
-    let _example = "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8";
     let input = include_str!("../../../inputs/2022_day04.txt");
 
-    let mut count = 0;
+    let (mut count1, mut count2) = (0, 0);
     for pair in input.lines() {
-        let mut tmp = pair.split(",");
-        let elf1 = tmp.next().unwrap();
-        let elf2 = tmp.next().unwrap();
-
-        let mut tmp = elf1.split("-");
-        let elf1_low = tmp.next().unwrap();
-        let elf1_high = tmp.next().unwrap();
-        let mut tmp = elf2.split("-");
-        let elf2_low = tmp.next().unwrap();
-        let elf2_high = tmp.next().unwrap();
-
-        if elf1_low >= elf2_low && elf1_high <= elf2_high && elf1 != elf2 {
-            count += 1;
-        } else
-        if elf2_low >= elf1_low && elf2_high <= elf1_high && elf1 != elf2 {
-            count += 1;
+        let mut elves: Vec<Vec<u32>> = vec![];
+        for range in pair.split(",") {
+            let elf = range.split("-").map(|number_str| number_str.parse::<u32>().unwrap()).collect::<Vec<u32>>();
+            elves.push(elf);
         }
+        let (elf1, elf2) = (&elves[0], &elves[1]);
+
+        count1 += is_overlap_part1(elf1, elf2);
+        count2 += is_overlap_part2(elf1, elf2);
     }
-    println!("{:?}", count)
+    println!("{:?}", count1);
+    println!("{:?}", count2);
 }

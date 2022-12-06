@@ -38,10 +38,6 @@ fn mutate_stacks1(stacks: &mut [Vec<char>; 9], proc: &Vec<(usize, usize, usize)>
 fn mutate_stacks2(stacks: &mut [Vec<char>; 9], proc: &Vec<(usize, usize, usize)>) {
     for &(amount, from, to) in proc.iter() {
         let from_len = stacks[from].len();
-        // let stack = stacks[from].clone();
-        // let slice = &stack[(from_len-amount)..];
-        // stacks[to].extend_from_slice(slice);
-        // stacks[from] = stack[0..from_len-amount].to_vec();
         let mut to_move: Vec<char> = stacks[from].drain(from_len-amount..).collect();
         stacks[to].append(&mut to_move);
     }

@@ -1,0 +1,6 @@
+/.clj-kondo/
+/.lsp/
+/clojure/.nrepl-port
+/clojure/.cpcache/
+/rust/Cargo.lock
+/rust/target/

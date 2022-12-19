@@ -61,15 +61,16 @@ fn get_valid_neighbors(point: &Point, map: &Map) -> Vec<Point> {
 
 fn lowest_f_score(open_set: &HashSet<Point>, f_score: &HashMap<Point, Score>) -> Point {
     // open_set should be a heap or a priority queue for performance
-    let (_, &current) = open_set.iter()
-                                .map(|p| (f_score.get(p).unwrap(), p))
-                                .sorted_by(|a, b| a.0.cmp(&b.0))
-                                .next().unwrap();
+    let &current = open_set.iter()
+                           .sorted_by(|a, b| f_score.get(a).cmp(&f_score.get(b)))
+                           .next().unwrap();
     current
 }
 
 fn a_star<F>(start: Point, goal: Point, h: F, map: &Map) -> Option<Path>
-where F: Fn(&Point) -> Score {
+where
+    F: Fn(&Point) -> Score
+{
     let mut open_set:  HashSet<Point> = HashSet::new();
     let mut came_from: HashMap<Point, Point> = HashMap::new();
     let mut g_score:   HashMap<Point, Score> = HashMap::new();  // actual cost to the point
@@ -102,18 +103,12 @@ where F: Fn(&Point) -> Score {
 }
 
 fn get_start_stop(map: [[char; N]; M]) -> (Point, Point) {
-    let mut start: Point = (255, 255, 255);
-    let mut stop: Point = (255, 255, 255);
-    for m in 0..M {
-        for n in 0..N {
-            if map[m][n] == 'S' {
-                start = (m, n, 0);
-            }
-            if map[m][n] == 'E' {
-                stop = (m, n, 26);
-            }
-        }
-    }
+    let start: Point = (0..M).cartesian_product(0..N)
+                             .filter(|&(m, n)| map[m][n] == 'S')
+                             .map(|(m, n)| (m, n, 0)).next().unwrap_or((255, 255, 255));
+    let stop: Point = (0..M).cartesian_product(0..N)
+                            .filter(|&(m, n)| map[m][n] == 'E')
+                            .map(|(m, n)| (m, n, 26)).next().unwrap_or((255, 255, 255));
     return (start, stop)
 }
 

@@ -10,6 +10,11 @@ local function get_input(t, example)
   end
 end
 
+---Returns a sliced copy of an array
+---@param tbl any[]
+---@param first integer
+---@param last integer
+---@param step integer
 local function slice(tbl, first, last, step)
   local sliced = {}
 
@@ -20,11 +25,18 @@ local function slice(tbl, first, last, step)
   return sliced
 end
 
+---Adds `__index` function to metatable
+---@param t table
+---@param d any
+---@return nil
 local function set_default(t, d)
   local mt = {__index = function () return d end}
   setmetatable(t, mt)
 end
 
+---Takes variable amount of tables or iterators and pairs the first items together, then the second, etc.
+---@vararg table|fun(): any
+---@return any ...
 local function zip(...)
   local arrays, ans = {...}, {}
   local index = 0
@@ -39,7 +51,9 @@ local function zip(...)
     end
 end
 
-
+---Returns true if all elements of array are true
+---@param t any[]
+---@return boolean
 local function all(t)
   for _, v in ipairs(t) do
     if not v then return false end

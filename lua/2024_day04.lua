@@ -21,6 +21,9 @@ for line in file:lines() do
 end
 
 -- Part 1
+local M <const> = #horizontal
+local N <const> = #horizontal[1]
+
 local create_vertical = function(t)
   local num_columns = #t[1]
   local vertical = {}
@@ -43,10 +46,7 @@ local make_array = function(len, default)
 end
 
 local create_diagonals = function(t)
-  local M <const> = #t
-  local N <const> = #t[1]
   local num_diagonals <const> = (M + N - 1)
-
   local diagonal, antidiagonal = make_array(num_diagonals, ""), make_array(num_diagonals, "")
 
   for m = 1, M do
@@ -105,32 +105,50 @@ end
 print("Part 1:", res)
 
 -- Part 2
-local xmatch = function(horis, diags, pattern)
-  local M <const> = #horis
-  local N <const> = #horis[1]
 
-  local get = function(m, n)
-    assert(m <= M, "get(m, n): m too large (got "..m.."), max: "..M)
-    assert(n <= N, "get(m, n): n too large (got "..n.."), max: "..N)
-    return horis[m]:sub(n, n)
+---Returns the center coordinates for a diagonal + string offset
+---@param diag integer
+---@param offset integer
+---@return integer ...
+local get_mn_from_cur_diag = function(diag, offset)
+  local m = math.max(M - (diag-1), 1) + offset
+  local n = math.max(diag - (M-1), 1) + offset
+  return m, n
+end
+
+---Returns character from horizontal at coordinates m, n
+---@param m integer
+---@param n integer
+---@return string
+local get = function(m, n)
+  assert(m <= M, "get(m, n): m too large (got "..m.."), max: "..M)
+  assert(n <= N, "get(m, n): n too large (got "..n.."), max: "..N)
+  return horizontal[m]:sub(n, n)
+end
+
+---Checks if the pattern is found in the antidiagonal
+local check_antidiagonal = function(m, n, pattern)
+  assert(#pattern == 3, "pattern needs to be 3 chars long")
+  if m+1 <= M and m-1 >= 1 and n+1 <= N and n-1 >= 0 then
+    local anti = get(m+1, n-1)..get(m, n)..get(m-1, n+1)
+    if anti == pattern or anti == string.reverse(pattern) then
+      return 1
+    end
   end
+  return 0
+end
 
+local xmatch = function(pattern)
   local sum = 0
-  for cur_diag, diag in ipairs(diags) do
-    for i, s in window_string(diag, #pattern) do
+  for cur_diag, diag in ipairs(diagonal) do
+    for string_offset, s in window_string(diag, #pattern) do
       if s == pattern or s == string.reverse(pattern) then
-        local m = math.max(M - (cur_diag-1), 1) + i
-        local n = math.max(cur_diag - (M-1), 1) + i
-        if m+1 <= M and m-1 >= 1 and n+1 <= N and n-1 >= 0 then
-          local anti = get(m+1, n-1)..get(m, n)..get(m-1, n+1)
-          if anti == pattern or anti == string.reverse(pattern) then
-            sum = sum + 1
-          end
-        end
+        local m, n = get_mn_from_cur_diag(cur_diag, string_offset)
+        sum = sum + check_antidiagonal(m, n, pattern)
       end
     end
   end
   return sum
 end
 
-print("Part 2:", xmatch(horizontal, diagonal, "MAS"))
+print("Part 2:", xmatch("MAS"))

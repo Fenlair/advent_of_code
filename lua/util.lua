@@ -28,10 +28,11 @@ end
 ---Adds `__index` function to metatable
 ---@param t table
 ---@param d any
----@return nil
+---@return table
 local function set_default(t, d)
   local mt = {__index = function () return d end}
   setmetatable(t, mt)
+  return t
 end
 
 ---Takes variable amount of tables or iterators and pairs the first items together, then the second, etc.
@@ -61,6 +62,15 @@ local function all(t)
   return true
 end
 
+
+local shallow_copy = function(tbl)
+  assert(type(tbl) == "table")
+  local copy = {}
+  for k, v in ipairs(tbl) do
+    copy[k] = v
+  end
+  return copy
+end
 
 local function sign(number)
   return (number > 0 and 1) or (number == 0 and 0) or -1

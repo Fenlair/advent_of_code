@@ -16,7 +16,7 @@ local data = {}
 for line in file:lines() do
   local numbers = {}
   for token in string.gmatch(line, "(%d+)") do
-	table.insert(numbers, tonumber(token))
+    table.insert(numbers, tonumber(token))
   end
   table.insert(data, numbers)
 end

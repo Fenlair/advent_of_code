@@ -1,4 +1,6 @@
 local function get_input(t, example)
+  assert(type(t["is_example"]) == "boolean")
+  assert(t.year and t.day and example)
   if t["is_example"] then
     local file = io.tmpfile()
     file:write(example)

@@ -129,6 +129,7 @@ end
 
 
 local walk = function(m, n, data, action)
+  local steps_taken = {}
   local direction = Dir.left
   repeat
     direction = update_direction(direction)
@@ -138,6 +139,12 @@ local walk = function(m, n, data, action)
     else
       m, n, data = move_vertical(m, n, direction, data, action)
     end
+
+    if steps_taken[{m, n, direction}] then
+      Obstacles = Obstacles + 1
+      break
+    end
+    steps_taken[{m, n, direction}] = true
   until not m
   return data
 end
@@ -157,17 +164,6 @@ end
 print("Part 1:", sum)
 
 -- Part 2
-Obstacles = 0
-local find_blocks = function(tbl, m, n, direction)
-  assert(tbl[m][n] ~= Field.blocked)
-  if direction == Dir.up    and (tbl[m + 1][n + 1] == Field.both or tbl[m + 1][n + 1] == Field.leftright) or
-     direction == Dir.right and (tbl[m + 1][n - 1] == Field.both or tbl[m + 1][n - 1] == Field.updown)    or
-     direction == Dir.down  and (tbl[m - 1][n - 1] == Field.both or tbl[m - 1][n - 1] == Field.leftright) or
-     direction == Dir.left  and (tbl[m - 1][n + 1] == Field.both or tbl[m - 1][n + 1] == Field.updown) then
-    Obstacles = Obstacles + 1
-    tbl[m][n] = Field.fake
-  end
-end
 
 walk(m_start, n_start, data, find_blocks)
 for _, line in ipairs(data) do
